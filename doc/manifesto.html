@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Taula</title>
-<link rel="stylesheet" type="text/css" href="style/vosgames.css"/>
-<link rel="stylesheet" type="text/css" href="style/concept.css"/>
+<title>Tumomo</title>
+<link rel="stylesheet" type="text/css" href="style/base.css"/>
 </head>
 <body>
-<h1>Taula - Documentation - Manifesto</h1>
+<h1>Tumomo - Documentation - Manifesto</h1>
 <p class="author">by Take Vos (2013)</p>
 
 <p>The reason to create a new programming language was for writing a game. I wanted a high level
@@ -39,7 +38,7 @@ These languages are often functional as they lend themselves for type inference 
 in C++ variables need to be declared with the auto type.
 </p>
 <p>Full type inference is not possible to do for a language because, like the halting problem, you will need to run the
-program to find out what the types are. Taula will use practical type inference, it will try its best and gives errors
+program to find out what the types are. Tumomo will use practical type inference, it will try its best and gives errors
 to the programmer when types can not be inferred and the reason why. The programmer may then rewrite the program or annotate
 the code with type constraints.
 </p>
@@ -61,7 +60,7 @@ the code with type constraints.
 has unpredictable performance implications and therefor less useful for interactive applications. Much more predictable is
 reference counting, although in aggregate it cost more CPU time.
 </p>
-<p>However the Taula compiler will try its best to never put objects in dynamic memory. It will try to keep objects in registers,
+<p>However the Tumomo compiler will try its best to never put objects in dynamic memory. It will try to keep objects in registers,
 on the stack and in statically allocated memory, whenever possible.
 </p>
 
@@ -69,7 +68,7 @@ on the stack and in statically allocated memory, whenever possible.
 <p>There haven't been many programming languages which will allow multi-threading. And especially will not automatically make
 object access thread-save.
 </p>
-<p>Because Taula through type inference knows a lot about the objects and how they are used, it may also be possible to figure out when
+<p>Because Tumomo through type inference knows a lot about the objects and how they are used, it may also be possible to figure out when
 an object is accessed from multiple threads. And if these threads to read only or read-write access. Therefor it is possible
 to automatically insert a read-write lock in the correct places.
 </p>
