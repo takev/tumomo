@@ -1,0 +1,21 @@
+
+class DictionaryItem (Token) {
+    __init__(position, data, length) {
+        super.__init__(position, data, length);
+    }
+
+    decode_childs() {
+        super.decode_childs();
+        name = this.childs[0];
+        value = this.childs[1];
+
+        case name
+        is Expression { this.name = name; }
+        else          { this.error("Expect first child of a dictionary item to be an expression."); }
+
+        case value
+        is Expression { this.value = value; }
+        else          { this.error("Expect second child of a dictionary item to be an expression."); }
+    }
+}
+

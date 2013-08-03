@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Taula</title>
+<link rel="stylesheet" type="text/css" href="style/vosgames.css"/>
+<link rel="stylesheet" type="text/css" href="style/concept.css"/>
+</head>
+<body>
+<h1>Taula - Documentation - Manifesto</h1>
+<p class="author">by Take Vos (2013)</p>
+
+<p>The reason to create a new programming language was for writing a game. I wanted a high level
+language with good performance. Something that functions like Python, but with the performance of
+a compiled language and with multi-threading.
+</p>
+
+<h2>Compiled</h2>
+<p>We now have had high level dynamic programming languages like Python, Perl and ECMAScript for
+many years. These languages are very efficient for the programmer, but lack somewhat at execution speed.
+</p>
+<p>There have been some experiment with Jit compiling these languages like PyPy. I believe it is time
+for a simular language to be completely compiled. The reasons to compile a language:
+</p>
+<ul>
+ <li>Execution performance, optimized to run on the CPU.</li>
+ <li>An application is easily to install with a single executable file.</li>
+ <li>Possible to create a system library which can be used from other languages using C calls.</li>
+ <li>Inline assembly makes it possible to do anything, in fact it helps with being used as a system language.</li>
+</ul>
+
+<h2>Type inference</h2>
+<p>Modern languages have a dynamic typing system, where the type is resolved at run time. Dynamic typing can even be done
+in compiled languages, as long as all classes inherent from a single class (often named 'object'), like in Objective C.
+</p>
+<p>There are some compiled languages that do local type inference, for types used for variables inside a function.
+These languages are often functional as they lend themselves for type inference quite well.
+</p>
+<p>Recently C++ added type inference to its language, which helps with declaring iterator variables for example. Still
+in C++ variables need to be declared with the auto type.
+</p>
+<p>Full type inference is not possible to do for a language because, like the halting problem, you will need to run the
+program to find out what the types are. Taula will use practical type inference, it will try its best and gives errors
+to the programmer when types can not be inferred and the reason why. The programmer may then rewrite the program or annotate
+the code with type constraints.
+</p>
+<p>The reasons to include type inference:
+</p>
+<ul>
+ <li>Execution performance, basic types which includes a single integer or real or vectors of integers and reals execute natively on the CPU.</li>
+ <li>Reduce clutter in the source code.</li>
+ <li>Source code can be annotated by the compiler to show the types a variable is assigned, to check for errors.</li>
+ <li>Minimize memory size of variables.</li>
+ <li>Detect if variables must be allocated dynamically, statically, on the stack or in registers.</li>
+ <li>Detect if objects are accessed read-only so that objects can be passed by object, or by reference.</li>
+ <li>Detect if objects are accessed by multiple threads, automatically executing alternative methods or adding locking.</li>
+ <li>Detect if variables are constant, possible collapsing calculations and logic.</li>
+</ul>
+
+<h2>Automatic memory management</h2>
+<p>Most high level languages have automatic memory management. I do not like mark-and-sweep garbage collection as this method
+has unpredictable performance implications and therefor less useful for interactive applications. Much more predictable is
+reference counting, although in aggregate it cost more CPU time.
+</p>
+<p>However the Taula compiler will try its best to never put objects in dynamic memory. It will try to keep objects in registers,
+on the stack and in statically allocated memory, whenever possible.
+</p>
+
+<h2>Multi threading</h2>
+<p>There haven't been many programming languages which will allow multi-threading. And especially will not automatically make
+object access thread-save.
+</p>
+<p>Because Taula through type inference knows a lot about the objects and how they are used, it may also be possible to figure out when
+an object is accessed from multiple threads. And if these threads to read only or read-write access. Therefor it is possible
+to automatically insert a read-write lock in the correct places.
+</p>
+<p>Next the developer can write its own specialist methods which can implement lock-free or wait-free version so automatic lock
+insertion becomes disabled. Completely new classes may need to be exchanged, because these algorithms may require more memory.
+</p>
+
+</body>
+</html>

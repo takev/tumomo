@@ -7,13 +7,18 @@ config.*
 configure
 libtool
 .deps
+.DS_Store
 stamp-h1
 *.pc
 *.o
 *.lo
+*.tap
 
 autom4te.cache
 buildutils
-yyast/libyyast.la
-yyast/.libs
+parser/lexer.c
+parser/parser.c
+parser/parser.output
+parser/taulap
 
+boot/taula

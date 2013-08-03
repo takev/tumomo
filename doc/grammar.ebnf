@@ -1,0 +1,123 @@
+
+
+file                        ::= import* class*
+
+import                      ::= 'import' ((fqname ('as' name)?) | fqwcname) ';'
+fqname                      ::= name ('.' name)*
+fqwcname                    ::= (name | '*') ('.' (name | '*'))*
+
+class                       ::= 'class' ( class_name ('(' class_name (',' class_name)*  ')')? | class_regex ) '{' method* '}'
+class_name                  ::= name
+class_regex                 ::= regex_literal
+
+method                      ::= attribute* (method_name | method_regex) ('(' argument_name ('=' constant_expression)? (',' argument_name ('=' constant_expression)?)* ')')? '{' statement* '}'
+attribute                   ::= name
+method_name                 ::= name
+method_regex                ::= regex_literal
+argument_name               ::= name
+constant_expression         ::= expression
+
+statement                   ::= expression_statement
+                              | for_loop 
+                              | while_loop
+                              | if_statement
+                              | case_statement
+                              | try_statement
+                              | break_statement
+                              | continue_statement
+                              | return_statement
+                              | raise_statement
+
+
+expression_statement        ::= expression ';'
+
+expression                  ::= assignment_expression
+                              | math_operation
+                              | inplace_math_operation
+                              | bitwise_operation
+                              | inplace_bitwise_operation
+                              | comparison_operation
+                              | access_operation
+                              | method_call
+                              | literal
+                              | logical_operation
+                              | comprehension
+
+assignment_operation        ::= expression '=' expression
+
+math_operation              ::= expression ('+' | '-' | '*' | '/' | '%' | '**' | '//' | '%%' ) expression
+                              | '|' expression '|'
+                              | '-' expression
+
+inplace_math_operation      ::= expression ('+=' | '-=' | '*=' | '/=' | '%=' | '**=' | '//=' | '%%=' ) expression
+
+bitwise_operation           ::= expression ('<<0' | '0>>' | '->>' | '<<|' | '|>>' | '&' | '|' | '^') expression
+                              | '~' expression
+
+inplacebitwise_operation    ::= expression ('<<0=' | '0>>=' | '->>=' | '<<|=' | '|>>=' | '&=' | '|=' | '^=') expression
+
+comparison_operation        ::= expression ('==' | '!=' | '<' | '>' | '<=' | '>=' | 'is' | 'in' | 'isa') expression
+
+access_operation            ::= expression '[' expression ']'
+                              | expression '[' expression? ':' expression? (':' expression?)? ']'
+                              | expression '.' name
+                              | expression ':' name
+
+logical_operation           ::= expression 'if' expression 'else' expression
+                              | expression ('||' | '&&') expression
+                              | '!' expression
+
+method_call                 ::= expression '(' ((argument_name '=') expression (',' (argument_name '=') expression)*)? ')'
+
+literal                     ::= integer_literal | real_literal | string_literal | regex_literal | list_literal | dictionary_literal | tuple_literal | set_literal | vector_literal
+
+integer_literal             ::= '-'? [0-9_]+
+                              | '0' [xX] [0-9a-fA-F_]+
+                              | '0' [dD] [0-9_]+
+                              | '0' [oO] [0-7_]+
+                              | '0' [bB] [0-1_]+
+
+real_literal                ::= '-'? ([0-9_]+ '.' [0-9_]* | [0-9_]* '.' [0-9_]+) ('e' '-'? [0-9]+)
+
+string_literal              ::= [rb]* '"' ([^"] | '\"')* '"'
+
+regex_literal               ::= '/' ([^/] | '\/')* '/'
+
+list_literal                ::= '[' ( expression (',' expression)* )? ','? ']'
+tuple_literal               ::= '(' ( expression (',' expression)* ','? | expression ',' | ',') ')'
+dictionary_literal          ::= '{' ( expression ':' expression (',' expression ':' expression)* ','? | ':' ) '}'
+set_literal                 ::= '{' ( expression (',' expression)* )? ','? '}'
+vector_literal              ::= '<' ( expression (',' expression)* ','? | expression ',' | ',') '>'
+
+comprehension               ::= lambda
+                              | list_comprehension
+                              | dictionary_comprehension
+
+lambda                      ::= 'lambda' name (',' name)* ','? ':' expression
+
+list_comprehension          ::= '[' expression for expression in expression if expression ']'
+
+dictionary_comprehension    ::= '{' expression ':' expression for expression in expression if expression '}'
+
+
+
+break_statement             ::= 'break' ';'
+continue_statement          ::= 'continue' ';'
+return_statement            ::= 'return' expression ';'
+raise_statement             ::= 'raise' expression ';'
+
+for_loop                    ::= 'for' name 'in' ('[' expression? ':' expression (':' expression?)? ']' | expression) '{' statement* '}' ('else' '{' statement* '}')?
+
+while_loop                  ::= ('do' '{' statement* '}')? 'while' expression (';' | '{' statement* '}' ('else' '{' statement* '}')? | 'else' '{' statement* '}')
+
+if_statement                ::= 'if' expression '{' statement* '}' ('elif' expression '{' statement* '}')* ('else' '{' statement* '}')?
+
+case_statement              ::= 'case' expression ('is' expression '{' statement* '}')* ('else' '{' statement* '}')?
+
+try_statement               ::= 'try' '{' statement* '}' ('except' class_name 'as' name '{' statement* '}')* ('else' '{' statement* '}')? ('finally' '{' statement* '}')?
+
+
+
+
+name                        ::= [a-zA-Z_] [a-zA-Z0-9_]*
+

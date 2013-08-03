@@ -1,0 +1,11 @@
+
+import taula.ast;
+
+class Node {
+    __init__(position, data, length) {
+        this.position = position;
+        this.length = length;
+        this.size = align64(length);
+    }
+}
+

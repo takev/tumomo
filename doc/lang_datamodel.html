@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Taula - Language Reference - Data model</title>
+<link rel="stylesheet" type="text/css" href="style/vosgames.css"/>
+<link rel="stylesheet" type="text/css" href="style/concept.css"/>
+</head>
+<body>
+<h1>Taula data model</h1>
+<p class="author">by Take Vos (2013)</p>
+
+<p>Objects are Taula's abstraction for all data. All data in a Taula program is represented by objects or by relations
+between objects.
+</p>
+
+<p>There are three different kind of objects:
+</p>
+<ul>
+ <li>Primative types.</li>
+ <li>Arrays of objects.</li>
+ <li>Classes.</li>
+</ul>
+
+<h2>Primative types</h2>
+<h3>Integer</h3>
+<h3>Floating point</h3>
+<h3>Vectors</h3>
+
+<h2>Array of objects</h2>
+
+
+<h2>Classes</h2>
+
+<h2>Memory management</h2>
+<p>Primatives and vectors (and classes which only contain a single primative or vector) can be held in registers and may
+not be stored in memory at all. If there are not enough registers the compiler will allocate extra memory on the stack
+to store these.
+</p>
+<p>If stack size permits, objects that are used locally will be allocated on the stack.
+</p>
+<p>Objects which are stored in the global namespace may be allocated statically.
+</p>
+<p>A dynamic sized object returned by a function must be allocated on the heap.
+</p>
+
+</body>
+</html>

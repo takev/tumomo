@@ -1,0 +1,9 @@
+
+import file;
+import taula.ast;
+
+parse(filename) {
+    text = file.readfile(filename);
+    module = Token.parse(buffer);
+}
+

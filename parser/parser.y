@@ -8,10 +8,7 @@ void yyerror(const char *message);
 %}
 
 /* decleration tokens */
-%token T_DEF T_CLASS T_PACKAGE T_IMPORT T_AS T_FROM T_SYNC
-
-/* method attributes */
-%token T_READ_ONLY T_THREAD_SAFE
+%token T_CLASS T_SELF T_IMPORT T_AS T_SYNC
 
 /* statement tokens */
 %token T_IF T_ELSE T_ELSE_IF T_WHILE T_DO T_FOR T_BREAK T_CONTINUE T_RETURN T_RAISE T_TRY T_CASE T_EXCEPT T_FINALLY
@@ -19,14 +16,15 @@ void yyerror(const char *message);
 
 /* primatives */
 %token T_NAME
-%token T_REAL T_INTEGER T_NONE T_TRUE T_FALSE T_STRING T_REGEX T_ASSEMBLY
+%token T_REAL T_INTEGER T_STRING T_REGEX T_ASSEMBLY
 
 /* operators */
-%token T_INCREMENT T_DECREMENT T_EQ T_NE T_LE T_GE
+%token T_EQ T_NE T_LE T_GE
 %token T_POW T_DIV_FLOOR T_MOD_FLOOR T_SHL T_SHR
 %token T_LOGICAL_AND T_LOGICAL_OR T_LOGICAL_XOR T_LOGICAL_NOT
 %token T_INPLACE_ADD T_INPLACE_SUB T_INPLACE_MUL T_INPLACE_DIV T_INPLACE_MOD T_INPLACE_AND T_INPLACE_OR T_INPLACE_XOR
 %token T_INPLACE_POW T_INPLACE_DIV_FLOOR T_INPLACE_MOD_FLOOR T_INPLACE_SHL T_INPLACE_SHR T_INPLACE_COPY
+%token T_ATTRIBUTE
 %token T_IN T_IS T_ISA
 
 %token T_UNKNOWN
@@ -40,13 +38,13 @@ void yyerror(const char *message);
 %left '-' '+'
 %left '*' '/' '%' T_DIV_FLOOR T_MOD_FLOOR
 %left T_POW
-%left '.'
+%left '.' '@'
 
 %left P_UMINUS '~' T_LOGICAL_NOT P_LENGTH
 %left P_TERTARY P_LAMBDA
 
 %right T_IF T_ELSE
-%right '=' T_INPLACE_ADD T_INPLACE_SUB T_INPLACE_MUL T_INPLACE_DIV T_INPLACE_MOD T_INPLACE_AND T_INPLACE_OR T_INPLACE_XOR
+%right '=' P_ASSIGN T_INPLACE_ADD T_INPLACE_SUB T_INPLACE_MUL T_INPLACE_DIV T_INPLACE_MOD T_INPLACE_AND T_INPLACE_OR T_INPLACE_XOR
 %right T_INPLACE_POW T_INPLACE_DIV_FLOOR T_INPLACE_MOD_FLOOR T_INPLACE_SHL T_INPLACE_SHR T_INPLACE_COPY
 
 %nonassoc ',' ':' '[' '(' '{'  T_LAMBDA
@@ -135,32 +133,25 @@ call_arguments
     ;
 
 /* fully qualified name, for package */
-fqname_content
+fqname_parts
     : T_NAME                                                                                { $$ = LIST(&$1, &$1, &$1); }
-    | fqname_content '.' T_NAME                                                             { $$ = LIST(&$1, &$3, &$1, &$3); }
+    | fqname_parts '.' T_NAME                                                               { $$ = LIST(&$1, &$3, &$1, &$3); }
     ;
 
 fqname
-    : fqname_content                                                                        { $$ = NODE(&$1, &$1, "fqnm", &$1); }
+    : fqname_parts                                                                          { $$ = NODE(&$1, &$1, "fqnm", &$1); }
     ;
 
-fqnames_content
+fqname_list
     : fqname                                                                                { $$ = LIST(&$1, &$1, &$1); }
-    | fqnames_content ',' fqname                                                            { $$ = LIST(&$1, &$3, &$1, &$3); }
+    | fqname_list ',' fqname                                                                { $$ = LIST(&$1, &$3, &$1, &$3); }
     ;
 
-fqnames
-    : fqnames_content                                                                       { $$ = NODE(&$1, &$1, "fqns", &$1); }
-    ;
-
-/* A list of names */
-names_content
-    : T_NAME                                                                                { $$ = LIST(&$1, &$1, &$1); }
-    | names ',' T_NAME                                                                      { $$ = LIST(&$1, &$3, &$1, &$3); }
-    ;
-
-names
-    : names_content                                                                         { $$ = NODE(&$1, &$1, "nms ", &$1); }
+sub_classes
+    :                                                                                       { $$ = EMPTYLIST; }
+    | ','                                                                                   { $$ = EMPTYLIST; }
+    | fqname_list                                                                           { $$ = $1; }
+    | fqname_list ','                                                                       { $$ = $1; }
     ;
 
 /* Block */
@@ -178,16 +169,15 @@ block_content
 expression
     : T_REAL                                                                                { $$ = $1; }
     | T_INTEGER                                                                             { $$ = $1; }
-    | T_NONE                                                                                { $$ = $1; }
-    | T_TRUE                                                                                { $$ = $1; }
-    | T_FALSE                                                                               { $$ = $1; }
     | T_STRING                                                                              { $$ = $1; }
     | T_REGEX                                                                               { $$ = $1; }
     | T_NAME                                                                                { $$ = $1; }
     | '{' dictionary_content '}'                                                            { $$ = NODE(&$1, &$3, "dict", &$2); }
     | '{' list_content '}'                                                                  { $$ = NODE(&$1, &$3, "set ", &$2); }
+    | '{' '}'                                                                               { $$ = NODE(&$1, &$2, "set ", EMPTYLIST); }
     | '[' dictionary_content ']'                                                            { $$ = NODE(&$1, &$3, "skip", &$2); }
     | '[' list_content ']'                                                                  { $$ = NODE(&$1, &$3, "list", &$2); }
+    | '[' ']'                                                                               { $$ = NODE(&$1, &$2, "list", EMPTYLIST); }
     | '(' tuple_content ')'                                                                 { $$ = NODE(&$1, &$3, "tupl", &$2); }
     | '{' expression T_FOR expression T_IN expression '}'                                   { $$ = NODE(&$1, &$7, "dcmp", &$2, &$4, &$6, PASS); }
     | '[' expression T_FOR expression T_IN expression ']'                                   { $$ = NODE(&$1, &$7, "lcmp", &$2, &$4, &$6, PASS); }
@@ -199,6 +189,7 @@ expression
     | '-' expression %prec P_UMINUS                                                         { $$ = NODE(&$1, &$2, "-   ", &$2); }
     | '|' expression '|' %prec P_LENGTH                                                     { $$ = NODE(&$1, &$2, "| | ", &$2); }
     | T_LOGICAL_NOT expression                                                              { $$ = NODE(&$1, &$2, "not ", &$2);  }
+    | T_CLASS '.' T_NAME                                                                    { $$ = NODE(&$1, &$3, ".   ", ya_name("class", 5), &$3); }
     | expression '.' T_NAME                                                                 { $$ = NODE(&$1, &$3, ".   ", &$1, &$3); }
     | expression T_SHL expression                                                           { $$ = NODE(&$1, &$3, "<<  ", &$1, &$3);}
     | expression T_SHR expression                                                           { $$ = NODE(&$1, &$3, ">>  ", &$1, &$3); }
@@ -271,6 +262,7 @@ statement
     | T_ASSEMBLY                                                                                        { $$ = $1; }
     | expression '(' call_arguments ')' ';'                                                             { $$ = NODE(&$1, &$5, "x() ", &$1, &$3); }
     | expression '=' expression ';'                                                                     { $$ = NODE(&$1, &$4, "=   ", &$1, &$3); }
+    | expression '@' T_NAME '=' expression ';'                                                          { $$ = NODE(&$1, &$6, "attr", &$1, &$3, &$5); }
     | expression T_INPLACE_COPY expression ';'                                                          { $$ = NODE(&$1, &$4, ":=  ", &$1, &$3); }
     | expression T_INPLACE_ADD expression ';'                                                           { $$ = NODE(&$1, &$4, "+=  ", &$1, &$3); }
     | expression T_INPLACE_SUB expression ';'                                                           { $$ = NODE(&$1, &$4, "-=  ", &$1, &$3); }
@@ -310,7 +302,7 @@ statement
     ;
 
 class_item
-    : T_DEF T_NAME '(' def_arguments ')' '{' block_content '}'                              { $$ = NODE(&$1, &$8, "func", &$2, &$4, &$7); }
+    : T_NAME '(' def_arguments ')' '{' block_content '}'                                    { $$ = NODE(&$1, &$7, "meth", &$1, &$3, &$6); }
     ;
 
 class_list
@@ -319,17 +311,16 @@ class_list
     ;
 
 class_content
-    :                                                                                       { $$ = EMPTYLIST; }
-    | class_list                                                                            { $$ = $1; }
+    :                                                                                       { $$ = NODE(END, END, "clco", EMPTYLIST); }
+    | class_list                                                                            { $$ = NODE(&$1, &$1, "clco", &$1); }
     ;
 
 module_item
-    : T_FROM fqname T_IMPORT '*' ';'                                                        { $$ = NODE(&$1, &$5, "impo", &$2, PASS, PASS); }
-    | T_FROM fqname T_IMPORT names ';'                                                      { $$ = NODE(&$1, &$5, "impo", &$2, &$4,         PASS); }
-    | T_FROM fqname T_IMPORT '*'   T_AS T_NAME ';'                                          { $$ = NODE(&$1, &$7, "impo", &$2, PASS, &$6); }
-    | T_FROM fqname T_IMPORT names T_AS T_NAME ';'                                          { $$ = NODE(&$1, &$7, "impo", &$2, &$4,         &$6); }
-    | T_CLASS T_NAME '(' fqnames ')' '{' class_content '}'                                  { $$ = NODE(&$1, &$8, "clas", &$2, &$4, &$7); }
-    | T_DEF T_NAME '(' def_arguments ')' '{' block_content '}'                              { $$ = NODE(&$1, &$8, "func", &$2, &$4, &$7); }
+    : T_IMPORT fqname ';'                                                                   { $$ = NODE(&$1, &$3, "impo", &$2, PASS); }
+    | T_IMPORT fqname T_AS T_NAME ';'                                                       { $$ = NODE(&$1, &$5, "impo", &$2, &$4); }
+    | T_CLASS T_NAME                     '{' class_content '}'                              { $$ = NODE(&$1, &$5, "clas", &$2, PASS, &$4); }
+    | T_CLASS T_NAME '(' sub_classes ')' '{' class_content '}'                              { $$ = NODE(&$1, &$8, "clas", &$2, &$4, &$7); }
+    | T_NAME '(' def_arguments ')' '{' block_content '}'                                    { $$ = NODE(&$1, &$7, "func", &$1, &$3, &$6); }
     ;
 
 module_list
@@ -355,6 +346,6 @@ void yyerror(const char *message)
 
 int main(int argc, char *argv[])
 {
-    return ya_main(argc, argv, "tast");
+    return ya_main(argc, argv, "tap");
 }
 

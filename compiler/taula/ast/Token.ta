@@ -1,0 +1,116 @@
+
+class Token (Node) {
+    __init__(position, data, length) {
+        super.__init__(position, data, length);
+        this.childs = Token.parse_childs(data, length);
+    }
+
+    parse_child(data) {
+        type     = buffer.decode_ASCII(0, 4);
+        length   = buffer.decode_be_u32(4);
+        position = buffer.decode_be_u64(8);
+        data     = buffer[16:];
+
+        case type
+        is "@pas" { return Pass(position, data, length); }
+        is "#doc" { return Documentation(position, data, length); }
+        is "#id " { return Identifier(position, data, length); }
+        is "#i64" { return IntegerLiteral(position, data, length); }
+        is "#u64" { return UnsignedIntegerLiteral(position, data, length); }
+        is "#f64" { return FloatLiteral(position, data, length); }
+        is "#str" { return StringLiteral(position, data, length); }
+        is "#re " { return RegularExpressionLiteral(position, data, length); }
+        is "#asm" { return Assembler(position, data, length); }
+        is "ditm" { return DictionaryItem(position, data, length); }
+        is "farg" { return FunctionArgument(position, data, length); }
+        is "carg" { return CallArgument(position, data, length); }
+        is "fqnm" { return FullyQualifiedName(position, data, length); }
+        is "fqns" { return FullyQualifiedNameList(position, data, length); }
+        is "nms " { return NameList(position, data, length); }
+        is "bloc" { return Block(position, data, length); }
+        is "dict" { return DictionaryLiteral(position, data, length); }
+        is "set " { return SetLiteral(position, data, length); }
+        is "skip" { return SkiplistLiteral(position, data, length); }
+        is "list" { return ListLiteral(position, data, length); }
+        is "tupl" { return TupleLiteral(position, data, length); }
+        is "dcmp" { return DictionaryComprehension(position, data, length); }
+        is "lcmp" { return ListComprehension(position, data, length); }
+        is "tcmp" { return TupleComprehension(position, data, length); }
+        is "~   " { return MonoExpression(position, data, length, type); }
+        is "-   " { return MonoExpression(position, data, length, type); }
+        is "| | " { return MonoExpression(position, data, length, type); }
+        is "not " { return MonoExpression(position, data, length, type); }
+        is ".   " { return BinaryExpression(position, data, length, type); }
+        is "<<  " { return BinaryExpression(position, data, length, type); }
+        is ">>  " { return BinaryExpression(position, data, length, type); }
+        is "**  " { return BinaryExpression(position, data, length, type); }
+        is "*   " { return BinaryExpression(position, data, length, type); }
+        is "//  " { return BinaryExpression(position, data, length, type); }
+        is "/   " { return BinaryExpression(position, data, length, type); }
+        is "%%  " { return BinaryExpression(position, data, length, type); }
+        is "%   " { return BinaryExpression(position, data, length, type); }
+        is "+   " { return BinaryExpression(position, data, length, type); }
+        is "-   " { return BinaryExpression(position, data, length, type); }
+        is "&   " { return BinaryExpression(position, data, length, type); }
+        is "^   " { return BinaryExpression(position, data, length, type); }
+        is "|   " { return BinaryExpression(position, data, length, type); }
+        is "is  " { return BinaryExpression(position, data, length, type); }
+        is "==  " { return BinaryExpression(position, data, length, type); }
+        is "!=  " { return BinaryExpression(position, data, length, type); }
+        is "<   " { return BinaryExpression(position, data, length, type); }
+        is ">   " { return BinaryExpression(position, data, length, type); }
+        is "<=  " { return BinaryExpression(position, data, length, type); }
+        is ">=  " { return BinaryExpression(position, data, length, type); }
+        is "and " { return BinaryExpression(position, data, length, type); }
+        is "xor " { return BinaryExpression(position, data, length, type); }
+        is "or  " { return BinaryExpression(position, data, length, type); }
+        is "in  " { return BinaryExpression(position, data, length, type); }
+        is "?:  " { return TrinaryExpression(position, data, length, type); }
+        is "x[] " { return IndexExpression(position, data, length); }
+        is "x[:]" { return SliceExpression(position, data, length); }
+        is "x() " { return CallExpression(position, data, length); }
+        is "lamd" { return LambdaFunction(position, data, length); }
+        is "=   " { return AssignmentStatement(position, data, length, type); }
+        is ":=  " { return AssignmentStatement(position, data, length, type); }
+        is "+=  " { return InplaceStatement(position, data, length, type); }
+        is "*=  " { return InplaceStatement(position, data, length, type); }
+        is "/=  " { return InplaceStatement(position, data, length, type); }
+        is "%=  " { return InplaceStatement(position, data, length, type); }
+        is "//= " { return InplaceStatement(position, data, length, type); }
+        is "%%= " { return InplaceStatement(position, data, length, type); }
+        is "<<= " { return InplaceStatement(position, data, length, type); }
+        is ">>= " { return InplaceStatement(position, data, length, type); }
+        is "&=  " { return InplaceStatement(position, data, length, type); }
+        is "|=  " { return InplaceStatement(position, data, length, type); }
+        is "^=  " { return InplaceStatement(position, data, length, type); }
+        is "brea" { return BreakStatement(position, data, length); }
+        is "cont" { return ContinueStatement(position, data, length); }
+        is "retu" { return ReturnStatement(position, data, length); }
+        is "rais" { return RaiseStatement(position, data, length); }
+        is "for " { return ForStatement(position, data, length); }
+        is "whil" { return WhileStatement(position, data, length); }
+        is "if  " { return IfStatement(position, data, length); }
+        is "try " { return TryStatement(position, data, length); }
+        is "case" { return CaseStatement(position, data, length); }
+        is "meth" { return MethodDefinition(position, data, length); }
+        is "impo" { return ImportStatement(position, data, length); }
+        is "from" { return FromStatement(position, data, length); }
+        is "clas" { return ClassDefinition(position, data, length); }
+        is "func" { return FunctionDefinition(position, data, length); }
+        is "modu" { return Module(position, data, length); }
+        else      { raise  UnknownToken(type); }
+    }
+
+    parse_childs(data, length) {
+        childs = [];
+
+        offset = 0;
+        while offset < length {
+            child = Token.parse(data[offset:]);
+            offset+= child.size;
+            childs.append(child);
+        }
+
+        return childs;
+    }
+}

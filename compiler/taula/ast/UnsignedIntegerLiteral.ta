@@ -1,0 +1,8 @@
+
+class UnsignedIntegerLiteral (Literal) {
+    __init__(position, data, length) {
+        super.__init__(position, data, length);
+        this.value = data.decode_be_u64(0);
+    }
+}
+

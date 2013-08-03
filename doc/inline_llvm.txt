@@ -1,0 +1,18 @@
+
+
+    pow(x, y)
+    {
+        x~llvm_type = 'double';
+        y~llvm_type = 'double';
+        y~llvm_name = '%foo';
+
+        c @= {'llvm_type': 'double'};
+
+        {{{
+            %r = call f64 @pow(f64 %x, f64 %foo)
+        }}}
+
+        r attribute llvm_type is 'double';
+
+        return r;
+    }

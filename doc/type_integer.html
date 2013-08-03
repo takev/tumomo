@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Taula</title>
+<link rel="stylesheet" type="text/css" href="style/vosgames.css"/>
+<link rel="stylesheet" type="text/css" href="style/concept.css"/>
+</head>
+<body>
+<h1>Taula - Documentation - Integer</h1>
+<p class="author">by Take Vos (2013)</p>
+
+<p>An integer is a simple type, meaning that it is not like a class
+and can not be inherinted from. However if a single short integer is used as an attribute for the class
+then an instance of the class may be passed as an integer on the CPU.
+</p>
+
+<h2>Short integer</h2>
+<p>A short integer is an integer which will fit in a CPU register. These days that is often 64-bit.
+</p>
+
+<h2>Long integer</h2>
+<p>Longer integers up to 2**32 number of bits are supported by LLVM and by Taula. It is an error
+if a integer is inferred to become larger.
+</p>
+
+<h2>Sizing an integer</h2>
+<p>During inferrence the size of an integer is calculated.
+</p>
+
+<table>
+<tr><th>Operation</th><th>Size calculation</th></tr>
+<td><td>c = a + b</th><th>c.__set_max(a.__max() + b.__max()), c.__set_min(a.__min() - b.__min())</th></tr>
+<td><td>c = a - b</th><th></th></tr>
+</table>
+
+</body>
+</html>

@@ -1,0 +1,73 @@
+
+Types
+=====
+
+object              base object.
+none                A none object
+boolean             true or false
+integer(n)          signed integer of n bits.
+unsigned(n)         unsigned integer of n bits.
+float(e,m)          binary floating point number of e exponent bits and m mantissa bits.
+decimal(e,m)        decimal floating point number of e exponent bits and m mantissa bits.
+fixed(l,r)          with l number of bits on the left of the point, and r number of bits on the right of the point.
+
+[n]                 postfix meaning an array of n objects.
+#                   prefix meaning that the object includes a type/vtable
+*                   prefix meaning that the object is stored on the heap instead of on the stack or register.
+
+<class attribute:type...>
+                    A class with attributes of certain types.
+
+Register/stack
+--------------
+By default all objects are stored in registers or on the stack. 
+Even polypmorphic objects will have their type/vtable pointer in a register.
+
+Only when the object is large, or passed into an external variable will the object be promoted as a heap object.
+heap objects will have a size, type/vtable, refcount and lock associated with it. A heap object will this automatically
+be polymorphic and can be used from multiple threads using reenterend-locking.
+
+type/vtable
+-----------
+By default objects don't come with a vtable. Only if a variable can be assigned multiple different types will
+the variable be marked to be polymorphic. The type of the variable will become the class that is a superclass
+for all objects that can be assigned to the variable.
+
+instanceof if or case statement
+-------------------------------
+A less generic version can be created inside a if or case statement when the type of a variable is compared
+to a type. The block inside the if or case label clause will have an internal variable which has the type
+that matches the compared to type.
+
+This means that inside a block the type no longer has to be polymorphic.
+
+Classes
+=======
+
+Attributes names
+----------------
+The name of each attribute is inferred from the methods of the specific class. Only attributes
+directly assigned through the explicit first method argument 'self' are taken into account.
+The attributes are sorted based on the order of assignment in the methods, this way you can explicitly
+define the order of structures.
+
+Attribute types
+---------------
+The type of attributes are passed on through its methods and need to be tracked throughout.
+
+However a more generic version of a class can stand in for the more specific 'tracked' type.
+This implementation type is based on how the methods of a class are using the attributes, the most
+generic form will be used.
+
+
+class A (object) {
+    __init__(self, b) {
+        self.b = b;
+    }
+}
+
+a = A(12)
+
+a will be assigned the tracked type: <A int8:b>, but has a generic type <A object8:b>.
+
+

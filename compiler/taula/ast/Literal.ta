@@ -1,0 +1,7 @@
+
+class Literal (Node) {
+    __init__(position, data, length) {
+        super.__init__(position, data, length);
+    }
+}
+

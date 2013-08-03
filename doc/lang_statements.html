@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Taula - Language Reference - Statements</title>
+<link rel="stylesheet" type="text/css" href="style/vosgames.css"/>
+<link rel="stylesheet" type="text/css" href="style/concept.css"/>
+</head>
+<body>
+<h1>Taula Statements</h1>
+<p class="author">by Take Vos (2013)</p>
+
+
+<h2>Assignment statement</h2>
+<p>The assignment statement assigns an instance to a variable.
+</p>
+
+<h3>Local variable assignment</h3>
+<p>Assignment to local variables are made directly to registers. LLVM does not make a difference between
+registers and stack.
+</p>
+<pre>
+a = 3;
+b = a + 2;
+</pre>
+
+<h3>Global variable assignment</h3>
+<p>Global variables are prefixed by the global keyword.
+</p>
+<pre>
+global.a = 3;
+global.b = global.a + 2;
+</pre>
+
+<h3>Thread global variables</h3>
+<p>Variables which are accessed from a thread.
+</p>
+<pre>
+thread.a = 3;
+thread.b = thread.a + 2;
+</pre>
+
+<h3>Direct instance attribute assignment</h3>
+<p>Assignment to instance values are directly done on the instance itself.
+</p>
+<pre>
+this.__a = 3;
+</pre>
+
+<h3>Indirect instance attribute assignment</h3>
+<p>An indirect attribute assignment is done by calling the setter __set_xxx__() method. Often the setter methods
+are generated implicetly and they themselves use direct instance attribute assignment.
+</p>
+<pre>
+this.a = 3;
+super.a = 3;    // Calls the __set_a__() method on the super class.
+</pre>
+
+<h3>Class attributes</h3>
+<p>A class may also have variables. They are always directly addressed.
+</p>
+<pre>
+class.a = 3;
+</pre>
+
+<h3>Type attribute</h3>
+<p>Type attributes give information/constraints about an instance/variable to the compiler.
+</p>
+<pre>
+a:low = 0;
+this.b:high = 5;
+</pre>
+
+<h2>Flow control statements</h2>
+<h3>If statement</h3>
+<p>The elif and else are optional.
+</p>
+<pre>
+if a == 3 {
+    // things to do when a equals 3.
+
+} elif a == 4 {
+    // things to do when a equals 4.
+
+} else {
+    // things to do when a is something else.
+}
+</pre>
+
+<h3>For items in a list</h3>
+<p>Loop over the items in a list.
+</p>
+<pre>
+for i in a {
+    // Do something with i.
+
+} else {
+    // called at the end of the loop, unless break was called.
+}
+</pre>
+
+<h3>For list of integers</h3>
+<p>Loop over a set of integers.
+</p>
+<pre>
+// From a, to b, increment by c.
+for i in [a:b:c] {
+    // Do something with i.
+}
+</pre>
+
+<h3>Do, While loop</h3>
+<p>Do, while loop, where the do, while and else statements are optional.
+</p>
+<pre>
+do {
+    // First do this, repeat while the expression is true.
+} while a &lt; 3 {
+    // Then do this, repeat while the expression is true
+} else {
+    // After when the expression is false do this, unless break was encountered.
+}
+</pre>
+<pre>
+do {
+
+} while a &gt; 3;
+</pre>
+
+<pre>
+while a == 4 {
+
+}
+</pre>
+
+<h2>Import statement</h2>
+<p>The import statement is used to import a class from a module into the namespace of the module.
+</p>
+<pre>
+import taula.math.Math as m;
+</pre>
+<p>From the file taula/math.ta import the class Math and name it m.
+</p>
+
+<pre>
+import taula.math.Math; // syntactic sugar for: import taula.math.Math as Math;
+</pre>
+
+<h2>Class definition</h2>
+<p>
+</p>
+<pre>
+class A {
+}
+
+class B (A) {
+    __init__() {
+        // Method called when creating an instance of B (constructor).
+        super.__init__();
+    }
+}
+
+<h2>Extending classes</h2>
+<p>Extra methods may be added to existing classes, even using wild card.
+</p>
+<pre>
+extend /.*/ {
+    before __init__() {
+        print("Called init");
+    }
+
+    after /__set_.*__/() {
+        print("Just finished setting an attribute.");
+    }
+}
+</pre>
+
+</body>
+</html>

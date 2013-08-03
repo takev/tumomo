@@ -6,21 +6,17 @@
 
 L           [a-zA-Z_]
 LD          [a-zA-Z0-9_]
-B           [01]
-O           [0-7]
-D           [0-9]
-H           [a-fA-F0-9]
-E           [Ee][+-]?{D}+
-P           [Pp][+-]?{D}+
+B           [01_]
+O           [0-7_]
+D           [0-9_]
+H           [a-fA-F0-9_]
+E           E-?{D}+
 WS          [ \t\v\n\f\r]
 
 %option noyywrap
 %x COMMENT
 %x ASSEMBLY
 %%
-
-"++"                                    { return T_INCREMENT; }
-"--"                                    { return T_DECREMENT; }
 
 ":="                                    { return T_INPLACE_COPY; }
 "**="                                   { return T_INPLACE_POW; }
@@ -65,45 +61,24 @@ WS          [ \t\v\n\f\r]
 "continue"                              { return T_CONTINUE; }
 "return"                                { return T_RETURN; }
 "raise"                                 { return T_RAISE; }
+"try"                                   { return T_TRY; }
 "except"                                { return T_EXCEPT; }
 "finally"                               { return T_FINALLY; }
-"def"                                   { return T_DEF; }
 "class"                                 { return T_CLASS; }
+"self"                                  { return T_SELF; }
 "import"                                { return T_IMPORT; }
 "as"                                    { return T_AS; }
 "lambda"                                { return T_LAMBDA; }
-"thread-safe"                           { return T_THREAD_SAFE; }
-"read-only"                             { return T_READ_ONLY; }
 
-[][+*/%&|^.=,:;(){}?-]                  { return yytext[0]; }
 
-"True"                                  { return T_TRUE; }
-"False"                                 { return T_FALSE; }
-"None"                                  { return T_NONE; }
+-?{D}+                                  |
+-?0[oO]{O}+                             |
+-?0[dD]{D}+                             |
+-?0[xX]{H}+                             |
+-?0[bB]{B}+                             { yylval = ya_int(yytext, yyleng); return T_INTEGER; }
 
-[-+]?[1-9]{D}*                          |
-[-+]?0{O}*                              |
-[-+]?0[oO]{O}+                          |
-[-+]?0[dD]{D}+                          |
-[-+]?0[xX]{H}+                          |
-[-+]?0[bB]{B}+                          { yylval = ya_int(yytext, yyleng); return T_INTEGER; }
-
-[-+]INFINITY                            |
-[-+]NAN                                 |
-[-+]?{D}+{E}?                           |
-[-+]?{D}*"."{D}+{E}?                    |
-[-+]?{D}+"."{D}*{E}?                    |
-[-+]?0[xX]{H}+{P}?                      |
-[-+]?0[xX]{H}*"."{D}+{P}?               |
-[-+]?0[xX]{H}+"."{D}*{P}?               { yylval = ya_real(yytext, yyleng); return T_REAL; }
-
-\"(\\.|[^\"])*\"                        { yylval = ya_string(&yytext[1], yyleng - 2); return T_STRING; }
-r\"(\\.|[^\"])*\"                       { yylval = ya_raw_string(&yytext[2], yyleng - 3); return T_STRING; }
-"/"(\\.|[^/])*"/"                       { yylval = ya_regex(&yytext[1], yyleng - 2); return T_REGEX; }
-
-{L}{LD}*                                { yylval = ya_name(yytext, yyleng); return T_NAME; }
-
-"//"[^\n]                               ;
+-?{D}*"."{D}+{E}?                       |
+-?{D}+"."{D}*{E}?                       { yylval = ya_real(yytext, yyleng); return T_REAL; }
 
 "{{{"                                   { yymore(); BEGIN(ASSEMBLY); }
 <ASSEMBLY>.                             { yymore(); }
@@ -113,11 +88,21 @@ r\"(\\.|[^\"])*\"                       { yylval = ya_raw_string(&yytext[2], yyl
 <COMMENT>.                              { yymore(); }
 <COMMENT>"*/"                           { BEGIN(INITIAL); }
 
+\"(\\.|[^\"])*\"                        { yylval = ya_string(&yytext[1], yyleng - 2); return T_STRING; }
+r\"(\\.|[^\"])*\"                       { yylval = ya_raw_string(&yytext[2], yyleng - 3); return T_STRING; }
+"/"[^/* ](\\.|[^/\n])*"/"               { yylval = ya_regex(&yytext[1], yyleng - 2); return T_REGEX; }
+
+{L}{LD}*                                { yylval = ya_name(yytext, yyleng); return T_NAME; }
+
+^#\ {D}+(\ \"(\\.|[^\"])*\")?$          { /* line control */ }
+
+"//"[^\n]*                              ;
+
 {WS}                                    ;
+
+[][+*/%&|^.=,:;(){}<>@~-]               { return yytext[0]; }
 
 .                                       { return T_UNKNOWN; }
 
-
 %%
-
 

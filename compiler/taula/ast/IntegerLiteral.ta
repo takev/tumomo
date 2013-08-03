@@ -1,0 +1,8 @@
+
+class IntegerLiteral (Literal) {
+    __init__(position, data, length) {
+        super.__init__(position, data, length);
+        this.value = data.decode_be_i64(0);
+    }
+}
+

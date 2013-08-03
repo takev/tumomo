@@ -1,0 +1,15 @@
+
+class Assembler (Literal, Post) {
+    __init__(position, data, length) {
+        super.__init__(position, data, length);
+        this.value = data.decode_UTF8(0, length);
+    }
+
+    foo(bar) {
+        while 1 {
+            test = 3;
+        }
+        return bar + 1;
+    }
+}
+

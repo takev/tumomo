@@ -1,41 +1,43 @@
 #!/usr/bin/env python
 
+"""taula2py - Translate a Taula code to Python code.
+
+The Taula code needs to be restricted to Python constructs, so it can be easilly
+translated.
+"""
+
 import sys
+import os.path
 from mmap import *
 from struct import *
 
 
-def t(l):
-    return "    " * l
+def t(level):
+    """Indent line by level"""
+    return "    " * level
 
 def pairs(p):
+    """Convert a list into a list of pairs."""
     return [(p[i], p[i+1]) for i in range(0, len(p), 2)]
+
+def align64(length):
+    return (length + 7) & 0xfffffffffffffff8
 
 class YAHeader (object):
     def __init__(self, buf):
         kind, length, position = unpack("!4sLQ", buf)
         self.kind = kind
         self.length = length
-        self.size = YAHeader.align64(length)
-        self.position = YAHeader.decode_position(position)
+        self.size = align64(length)
 
     def is_literal(self):
         return self.kind[0] == "#"
-
-    @classmethod
-    def decode_position(cls, position):
-        return position
-
-    @classmethod
-    def align64(cls, length):
-        return (length + 7) & 0xfffffffffffffff8
 
 class YANode (object):
     def __init__(self, header):
         self.length = header.length
         self.size = header.size
         self.kind = header.kind
-        self.position = header.position
         self.childs = []
 
     def add(self, child):
@@ -57,7 +59,16 @@ class YANode (object):
             "|   ", "is  ", "==  ", "!=  ", "<   ", ">   ", "<=  ", ">=  ", "and ", "or  ", "in  ",
         ):
             op = " " + self.kind.strip() + " "
-            return op.join(child.wp() for child in self.childs)
+            return "(" + op.join(child.wp() for child in self.childs) + ")"
+
+        elif self.kind == "=   ":
+            return "\n" + t(l) + " = ".join(child.wp() for child in self.childs)
+
+        elif self.kind == "fqnm":
+            return ".".join(child.wp() for child in self.childs)
+
+        elif self.kind == "fqns":
+            return ", ".join(child.wp() for child in self.childs)
 
         elif self.kind == "farg":
             name, expr = [child.wp() for child in self.childs]
@@ -71,12 +82,31 @@ class YANode (object):
             name = self.childs[0].wp()
             block = self.childs[-1].wp(l + 1)
             arguments = ",".join(child.wp() for child in self.childs[1:-1])
-            return t(l) + "def %s(%s):\n%s\n" % (name, arguments, block)
+            return t(l) + "\ndef %s(%s):\n%s" % (name, arguments, block)
+
+        elif self.kind == "meth":
+            name = self.childs[0].wp()
+            block = self.childs[-1].wp(l + 1)
+            arguments = ",".join(child.wp() for child in self.childs[1:-1])
+            return t(l) + "\n" + t(l) + "def %s(this, %s):\n%s" % (name, arguments, block)
+
+        elif self.kind == "clas":
+            name = self.childs[0].wp()
+            block = self.childs[-1].wp(l + 1)
+            subclasses = self.childs[1].wp() if self.childs[1] is not None else "object"
+            return t(l) + "\nclass %s(%s):\n%s" % (name, subclasses, block)
 
         elif self.kind == "x() ":
             name = self.childs[0].wp()
             arguments = ",".join(child.wp() for child in self.childs[1:])
-            return t(l) + "%s(%s)\n" % (name, arguments)
+            return t(l) + "%s(%s)" % (name, arguments)
+
+        elif self.kind == "impo":
+            name, _as = [child.wp() for child in self.childs]
+            if _as is None:
+                return "import %s" % (name,)
+            else:
+                return "import %s as %s" % (name, _as)
 
         else:
             raise NotImplementedError("Node '%s' unknown" % self.kind)
@@ -117,8 +147,7 @@ class YALiteral (YANode):
 
 def node_decode(buf):
     if len(buf) < 16:
-        print >>sys.stderr, "!error: Not enough size to decode header."
-        sys.exit(1)
+        raise RuntimeError("!error: Not enough size to decode header.")
 
     header = YAHeader(buf[:16])
     inner = buf[16:header.length]
@@ -141,17 +170,19 @@ def main(argv):
     if len(argv) != 2:
         raise RuntimeError("Need one file argument")
 
-    filename = argv[1]
+    in_filename = argv[1]
+    out_filename = os.path.splitext(in_filename)[0] + ".py"
 
-    fdin = open(filename, "rb")
+    fdin = open(in_filename, "rb")
     buf = mmap(fdin.fileno(), 0, MAP_SHARED, PROT_READ)
 
     tree = node_decode(buf)
-    print tree.wp(0)
 
     buf.close()
     fdin.close()
 
+    fdout = open(out_filename, "wb")
+    fdout.write(tree.wp(0))
 
 
 if __name__ == "__main__":
