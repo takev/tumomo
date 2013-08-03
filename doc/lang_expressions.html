@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Taula - Language Reference - Expressions</title>
+<link rel="stylesheet" type="text/css" href="style/vosgames.css"/>
+<link rel="stylesheet" type="text/css" href="style/concept.css"/>
+</head>
+<body>
+<h1>Taula Expressions</h1>
+<p class="author">by Take Vos (2013)</p>
+
+<h2>Literal</h2>
+<p>Literal are <strong>reals</strong>, <strong>integer</strong>, <strong>unicode strings</strong> and
+<strong>unicode regex</strong>.
+</p>
+
+<h2>Identifier</h2>
+<p>The special identifiers <strong>this</strong>, <strong>super</strong>, <strong>class</strong>,
+<strong>module</strong> and <strong>global</strong> point to specific name spaces.
+</p>
+<ul>
+ <li>Local variable, to the method or function.</li>
+ <li>function, class or an imported module in the module namespace.</li>
+</ul>
+
+<h2>Call</h2>
+<p>The only executable unit is a method. A method may be called on a instance or on a class.
+</p>
+
+<h2>Operators</h2>
+<p>Operators are syntactic sugar which will call specific methods.
+</p>
+
+<h3>Mathematical operators</h3>
+<table>
+<tr><th>Operator</th><th>Translated into</th><th>Description</th></tr>
+<tr><td>a + b</td><td>a.__add__(b)</td><td>Add two objects together. Or append two arrays together</td></tr>
+<tr><td>a - b</td><td>a.__sub__(b)</td><td>Subtract two objects from each other.</td></tr>
+<tr><td>a * b</td><td>a.__mul__(b)</td><td>Multiply two objects together.</td></tr>
+<tr><td>a / b</td><td>a.__div__(b)</td><td>Divide object a by b.</td></tr>
+<tr><td>a % b</td><td>a.__mod__(b)</td><td>Return the rest value from a divide of object a by b.</td></tr>
+<tr><td>a ** b</td><td>a.__pow__(b)</td><td>Raise a to the power of b.</td></tr>
+<tr><td>a // b</td><td>a.__floordiv__(b)</td><td>Divide object a by b and return an integer by flooring the result.</td></tr>
+<tr><td>a %% b</td><td>a.__floormod__(b)</td><td>Divide object a by b and return an integer rest value by flooring the result.</td></tr>
+<tr><td>|a|</td><td>a.__len__()</td><td>Length of a.</td></tr>
+<tr><td>-a</td><td>a.__neg__()</td><td>Make value negative.</td></tr>
+</table>
+
+<h3>In-place mathematical operators</h3>
+<table>
+<tr><th>Operator</th><th>Translated into</th><th>Description</th></tr>
+<tr><td>a += b</td><td>a.__iadd__(b)</td><td>Inplace addition.</td></tr>
+<tr><td>a -= b</td><td>a.__isub__(b)</td><td>Inplace subtract.</td></tr>
+<tr><td>a *= b</td><td>a.__imul__(b)</td><td>Inplace multiply.</td></tr>
+<tr><td>a /= b</td><td>a.__idiv__(b)</td><td>Inplace divide.</td></tr>
+<tr><td>a %= b</td><td>a.__imod__(b)</td><td>Inplace modulo.</td></tr>
+<tr><td>a **= b</td><td>a.__ipow__(b)</td><td>Inplace power.</td></tr>
+<tr><td>a //= b</td><td>a.__ifloordiv__(b)</td><td>Inplace floor of a division.</td></tr>
+<tr><td>a %%= b</td><td>a.__ifloordiv__(b)</td><td>Inplace floor of a modulo.</td></tr>
+</table>
+
+<h3>Bitwise operators</h3>
+<table>
+<tr><th>Operator</th><th>Translated into</th><th>Description</th></tr>
+<tr><td>a &lt;&lt;0 b</td><td>a.__lshift__(b)</td><td>Shift the bits in a to the left by b bits, fill with zeros.</td></tr>
+<tr><td>a 0&gt;&gt; b</td><td>a.__rshift__(b)</td><td>Shift the bits in a to the right by b bits, fill with zeros.</td></tr>
+<tr><td>a -&gt;&gt; b</td><td>a.__rsshift__(b)</td><td>Shift the bits in a to the right by b bits, sign extend the last bit.</td></tr>
+<tr><td>a &lt;&lt;| b</td><td>a.__lrotate__(b)</td><td>Rotate the bits in a to the left by b number of bits.</td></tr>
+<tr><td>a |&gt;&gt; b</td><td>a.__rrotate__(b)</td><td>Rotate the bits in a to the right by b number of bits.</td></tr>
+<tr><td>a &amp; b</td><td>a.__and__(b)</td><td>And the bits in b to a.</td></tr>
+<tr><td>a | b</td><td>a.__or__(b)</td><td>Or the bits in b to a.</td></tr>
+<tr><td>a ^ b</td><td>a.__xor__(b)</td><td>Xor the bits in b to a.</td></tr>
+<tr><td>~a</td><td>a.__invert__()</td><td>invert each bit in a.</td></tr>
+</table>
+
+<h3>In-place bitwise operators</h3>
+<table>
+<tr><th>Operator</th><th>Translated into</th><th>Description</th></tr>
+<tr><td>a &lt;&lt;0= b</td><td>a.__ilshift__(b)</td><td>Inplace shift left with zero extension.</td></tr>
+<tr><td>a 0&gt;&gt;= b</td><td>a.__irshift__(b)</td><td>Inplace shift right with zero extension.</td></tr>
+<tr><td>a -&gt;&gt;= b</td><td>a.__irshift__(b)</td><td>Inplace shift right with sign extension.</td></tr>
+<tr><td>a &lt;&lt;|= b</td><td>a.__irshift__(b)</td><td>Inplace rotate left.</td></tr>
+<tr><td>a |&gt;&gt;= b</td><td>a.__irshift__(b)</td><td>Inplace rotate right.</td></tr>
+<tr><td>a &amp;= b</td><td>a.__iand__(b)</td><td>Inplace bitwise and.</td></tr>
+<tr><td>a |= b</td><td>a.__ior__(b)</td><td>Inplace bitwise or.</td></tr>
+<tr><td>a ^= b</td><td>a.__ixor__(b)</td><td>Inplace bitwise xor.</td></tr>
+</table>
+
+<h3>Comparison operators</h3>
+<table>
+<tr><th>Operator</th><th>Translated into</th><th>Description</th></tr>
+<tr><td>a == b</td><td>a.__eq__(b)</td><td>Compare if a and b are equal</td></tr>
+<tr><td>a != b</td><td>a.__ne__(b)</td><td>Compare if a and b are not equal</td></tr>
+<tr><td>a &lt; b</td><td>a.__lt__(b)</td><td>Compare if a is less than b</td></tr>
+<tr><td>a &gt; b</td><td>a.__gt__(b)</td><td>Compare if a is greater than b</td></tr>
+<tr><td>a &lt;= b</td><td>a.__le__(b)</td><td>Compare if a is less than or equal to b</td></tr>
+<tr><td>a &gt;= b</td><td>a.__ge__(b)</td><td>Compare if a is greater than or equal to b</td></tr>
+<tr><td>a is b</td><td>a.__is__(b)</td><td>Compare if a and b are the same object</td></tr>
+<tr><td>a is not b</td><td>a.__isnot__(b)</td><td>Compare if a and b are not the same object</td></tr>
+</table>
+
+<h3>Indexing, slicing and attribute access</h3>
+<table>
+<tr><th>Operator</th><th>Translated into</th><th>Description</th></tr>
+<tr><td>a[i:j:k]</td><td>a.__slice__(i, j, k)</td><td>Slice an array starting from i, ending before j, and incrementing by k</td></tr>
+<tr><td>a[i:j]</td><td>a.__slice__(i, j, 1)</td><td>Slice an array starting from i, ending before j, and incrementing by k</td></tr>
+<tr><td>a[i]</td><td>a.__getitem__(i)</td><td>Slice an array starting from i, ending before j, and incrementing by k</td></tr>
+<tr><td>a[i] = b</td><td>a.__setitem__(i, b)</td><td>Assignment operator on an item </td></tr>
+<tr><td>a.b</td><td>a.__get_b__()</td><td>Getter of an attribute of an instance, automatically generated or manually written.</td></tr>
+<tr><td>a.b = c</td><td>a.__set_b__(c)</td><td>Setter of an attribute of an instance, automatically generated or manually written.</td></tr>
+<tr><td>a:b</td><td></td><td>Direct access to the attribute of an instance, should be used in constructors, and setters/getters.</td></tr>
+<tr><td>a@b</td><td></td><td>Direct access to the compiler-attribute of an object, should be used during I/O and assembly.</td></tr>
+</table>
+ 
+<h3>Logical operators</h3>
+<p>Logical operators first execute __istrue__() or __isfalse__() on its operants. Both of these methods should return
+a single bit integer, 1 if an integer or real number is not zero, 1 if an list or a dictionary is not empty, 1 if
+the length of a vector is not zero.
+</p>
+<table>
+<tr><th>Operator</th><th>translated into</th><th>Description</th></tr>
+<tr><td>a</td><td>a.__istrue__()</td><td>Any statement which expects a boolean will call __istrue__ on its expression.</td></tr>
+<tr><td>!a</td><td>a.__isfalse__()</td><td>Logical not on an expression.</td></tr>
+<tr><td>a || b</td><td>a if a.__istrue__() else b</td><td>Logical or, which will return either a or b.</td></tr>
+<tr><td>a &amp;&amp; b</td><td>b if a.__istrue__() else a</td><td>Logical and, which will return either a or b.</td></tr>
+<tr><td>a ^^ b</td><td>a.__istrue__().__xor__(b.__istrue__())</td><td>Logical xor, which will return either 0 or 1.</td></tr>
+<tr><td>a if b else c</td><td>a if b.__istrue__() else b</td><td>Ternary operator.</td></tr>
+</table>
+
+</body>
+</html>

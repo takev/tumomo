@@ -1,0 +1,39 @@
+TAULA LANGUAGE SYNTAX
+=====================
+
+Each Taula text file is a description of a module. The module may import other modules and can define
+classes and functions. A function called main() is automatically called on execution of a binary.
+
+Import
+------
+You can import a module using a fully qualified name, it is recommended to use reverse domain name style names for the module names.
+You can specify a short cut to reference content easier, if a short cut is not specified, the last name in the fully qualified module name
+is implied.
+
+Syntax:
+    import <fqname>;
+    import <fqname> as <local name>;
+
+Example:
+    import nl.vosgames.taula.math;         (This implies "import nl.vosgames.math as math;")
+    import nl.vosgames.taula.math as m;
+
+Function definition
+-------------------
+
+Syntax:
+    <name> '(' <name> [ '=' <expression> ] ( ',' <name> [ '=' <expression> ] )*   [','] ')' '{' <block> '}'
+
+Example:
+    factorial(n)
+    {
+        if (n == 0) {
+            return 1;
+        } else {
+            return n * factorial(n - 1);
+        }
+    }
+
+
+
+
